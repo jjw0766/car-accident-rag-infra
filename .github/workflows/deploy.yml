@@ -1,0 +1,48 @@
+name: AWS Terraform Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+# OIDC 인증을 위한 필수 권한 설정
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  # AWS 콘솔에서 확인한 Role ARN을 입력하세요
+  AWS_ROLE_ARN: arn:aws:iam::443370697536:role/SafeRole-hyuniv-32
+  AWS_ROLE_SESSION_NAME: terraform-session
+  
+  # Terraform 변수 매핑
+  TF_VAR_region: us-east-1
+  TF_VAR_key_name: hyuniv32-key-2 # 본인의 AWS Key Pair 이름
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # OIDC를 이용한 AWS 로그인 (Access Key 불필요)
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: ${{ env.AWS_ROLE_SESSION_NAME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
