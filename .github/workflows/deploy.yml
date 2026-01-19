@@ -12,7 +12,7 @@ permissions:
 env:
   AWS_REGION: us-east-1
   # AWS 콘솔에서 확인한 Role ARN을 입력하세요
-  AWS_ROLE_ARN: arn:aws:iam::443370697536:role/SafeRole-hyuniv-32
+  AWS_ROLE_ARN: arn:aws:iam::443370697536:role/SafeInstanceRole-hyuniv-32
   AWS_ROLE_SESSION_NAME: terraform-session
   
   # Terraform 변수 매핑
